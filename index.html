@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WhatsApp Chat Viewer</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-image: url("https://w0.peakpx.com/wallpaper/818/148/HD-wallpaper-whatsapp-background-cool-dark-green-new-theme-whatsapp.jpg");
+      background-repeat: no-repeat;
+      background-size: cover;
+      background-position: center;
+      margin: 0;
+      padding: 20px;
+    }
+
+    .chat-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 20px;
+      border-bottom: 1px solid #ddd;
+    }
+
+    .chat-header h1 {
+      font-size: 20px;
+      margin: 0;
+    }
+
+    .chat-body {
+      padding: 20px;
+      overflow-y: scroll;
+      height: calc(100vh - 100px);
+    }
+
+    .message-container {
+      background-color: #fff;
+      border-radius: 10px;
+      margin-bottom: 10px;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      max-width: 70%;
+      word-wrap: break-word;
+    }
+
+    .message-sent {
+      background-color: #dcf8c6;
+      align-items: flex-end;
+    }
+
+    .sender {
+      font-weight: bold;
+      color: #075e54;
+      margin-bottom: 5px;
+    }
+
+    .message-text {
+      color: #333;
+    }
+
+    .timestamp {
+      color: #999;
+      font-size: 0.8em;
+      margin-top: 5px;
+    }
+
+    .image {
+      max-width: 200px;
+      max-height: 200px;
+      object-fit: cover;
+      border-radius: 5px;
+      margin-top: 10px;
+    }
+
+    .typing-indicator {
+      font-size: 12px;
+      color: #999;
+      margin-top: 10px;
+    }
+
+    .message-container::after {
+      content: "";
+      position: absolute;
+      width: 0;
+      height: 0;
+      border-style: solid;
+      border-width: 10px 10px 0 10px; 
+      border-color: transparent transparent #fff transparent;
+      right: -10px;
+      bottom: 10px;
+    }
+
+    .message-sent::after {
+      left: -10px;
+      border-color: transparent transparent #fff transparent;
+    }
+  </style>
+</head>
+<body>
+  <h1 style="text-align: center;">WhatsApp Chat Viewer</h1>
+  <div id="chat" style="margin: auto;"></div>
+  <script>
+    function loadChatData(file) {
+      fetch(file)
+        .then(response => response.text())
+        .then(data => displayChat(data))
+        .catch(error => console.error('Error loading chat data:', error));
+    }
+
+    function displayChat(chatData) {
+      const chatDiv = document.getElementById('chat');
+      const messages = chatData.split('\n');
+      
+      messages.forEach(message => {
+        const messageParts = message.split('] ');
+        const timestamp = messageParts[0].replace('[', '');
+
+        if (messageParts.length > 1) {
+          const senderAndText = messageParts[1].split(': ');
+          const sender = senderAndText[0];
+          let text = senderAndText.slice(1).join(': ');
+
+          const messageContainer = document.createElement('div');
+          messageContainer.classList.add('message-container');
+
+          const senderSpan = document.createElement('span');
+          senderSpan.classList.add('sender');
+          senderSpan.textContent = sender;
+
+          const textSpan = document.createElement('span');
+          textSpan.classList.add('message-text');
+          textSpan.textContent = text;
+
+          const timestampSpan = document.createElement('span');
+          timestampSpan.classList.add('timestamp');
+          timestampSpan.textContent = timestamp;
+
+          messageContainer.appendChild(senderSpan);
+          
+          if (text.includes('imagen omitida')) {
+            const imageSpan = document.createElement('span');
+            imageSpan.classList.add('image');
+            imageSpan.textContent = ' [Image omitted]';
+            messageContainer.appendChild(imageSpan);
+          } else {
+            messageContainer.appendChild(textSpan);
+          }
+          
+          messageContainer.appendChild(timestampSpan);
+
+          chatDiv.appendChild(messageContainer);
+        }
+      });
+    }
+    loadChatData('_chat.txt');
+  </script>
+</body>
+</html>
